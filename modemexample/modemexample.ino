@@ -1,5 +1,6 @@
 // FOR RYAN AND SHWET
-
+//0b1100 is low frequency
+//0b1010 is 2x low frequency
 #include <DueTimer.h>
 
 #include <Arduino.h>
@@ -70,6 +71,28 @@ void sendBit(bool bit)
     digitalWriteDirect(TX_PIN, LOW);  // sets the pin off
     delayMicroseconds(SOFT_MODEM_0_PERIOD_US/2);      // pauses for 50 microseconds    
   }
+}
+
+void sendStr(String c)
+{
+  //preamble
+  for(int i = 0; i < 49;i++){
+    sendBit(1);
+  }
+  for(int j = 0; j < c.length(); j++){
+    sendBit(0); //0
+  
+    //reversed ascii
+    char mask = 0b10000000;
+    for (int i = 0; i < 8; i++){
+      sendBit(mask&c[j]);
+      mask = mask >> 1;
+    }
+  
+    sendBit(1); //1
+  }
+
+  sendBit(1); //postamble
 }
 
 /*================================================================================*\
